@@ -17,8 +17,8 @@ export default function NumberParticlesBackground() {
 
   const initParticles = useCallback((width: number, height: number) => {
     const particles: NumberParticle[] = [];
-    const columns = 45;
-    const rows = 45;
+    const columns = 37;
+    const rows = 37;
     const cellWidth = width / columns;
     const cellHeight = height / rows;
     const fillProbability = 0.85;
