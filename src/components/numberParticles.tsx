@@ -37,7 +37,7 @@ export default function NumberParticlesBackground() {
         if (Math.random() > fillProbability) continue;
         const baseX = col * cellWidth + cellWidth / 2;
         const baseY = row * cellHeight + cellHeight / 2;
-        const randomOffset = 15;
+        const randomOffset = 10;
 
         // Create x and y coordinates using the base variables and offset.
         const x = baseX + (Math.random() - 0.5) * randomOffset;
@@ -89,6 +89,32 @@ export default function NumberParticlesBackground() {
     });
   }, []);
 
+  const drawMouseLight = (ctx: CanvasRenderingContext2D) => {
+    const lightRadius = 1000;
+    const { x, y } = mouseRef.current;
+
+    const gradient = ctx.createRadialGradient(
+      x,
+      y,
+      200 * 0.3, // Inner radius.
+      x,
+      y,
+      lightRadius, // Outer radius.
+    );
+
+    gradient.addColorStop(0, "rgba(0, 100, 120, 0.25)"); // Deep teal center.
+    gradient.addColorStop(0.4, "rgba(0, 80, 100, 0.15)"); // Medium teal.
+    gradient.addColorStop(0.7, "rgba(0, 60, 80, 0.05)"); // Dark teal.
+    gradient.addColorStop(0.95, "rgba(0, 40, 60, 0.01)"); // Very dark teal.
+    gradient.addColorStop(1, "rgba(0, 0, 0, 0)");
+
+    // Draw the light circle.
+    ctx.fillStyle = gradient;
+    ctx.beginPath();
+    ctx.arc(x, y, lightRadius, 0, Math.PI * 2);
+    ctx.fill();
+  };
+
   const updateParticles = useCallback(
     (
       ctx: CanvasRenderingContext2D,
@@ -108,6 +134,8 @@ export default function NumberParticlesBackground() {
       // Fill the canvas with black color to avoid fading effect.
       ctx.fillStyle = "black";
       ctx.fillRect(0, 0, width, height);
+
+      drawMouseLight(ctx);
 
       // Create size groups for batched rendering.
       const groups = {
@@ -134,16 +162,16 @@ export default function NumberParticlesBackground() {
         if (size > 20) groups.extraLarge.push({ particle });
         else if (size > 16) groups.large.push({ particle });
         else if (size > 14) groups.medium.push({ particle });
-        else if (size > 12) groups.small.push({ particle });
+        else if (size > 13) groups.small.push({ particle });
         else groups.extraSmall.push({ particle });
       });
 
       // Batch write the particles based on groups.
-      drawGroup(ctx, groups.extraLarge, "32px monospace");
-      drawGroup(ctx, groups.large, "24px monospace");
-      drawGroup(ctx, groups.medium, "18px monospace");
+      drawGroup(ctx, groups.extraLarge, "32px JetBrains Mono");
+      drawGroup(ctx, groups.large, "24px JetBrains Mono");
+      drawGroup(ctx, groups.medium, "18px JetBrains Mono");
       drawGroup(ctx, groups.small, "14px monospace");
-      drawGroup(ctx, groups.extraSmall, "10px monospace");
+      drawGroup(ctx, groups.extraSmall, "10px JetBrains Mono");
     },
     [updateAllNumbers],
   );
@@ -160,8 +188,8 @@ export default function NumberParticlesBackground() {
     ctx.textBaseline = "middle";
 
     particles.forEach(({ particle }) => {
-      const opacity = 0.8 - particle.z * 0.5;
-      ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
+      const opacity = 0.7 - particle.z * 0.5;
+      ctx.fillStyle = `rgba(191, 191, 191, ${opacity})`;
       ctx.fillText(particle.value.toString(), particle.x, particle.y);
     });
   };
@@ -213,6 +241,7 @@ export default function NumberParticlesBackground() {
         height: "100%",
         zIndex: -1,
         background: "black",
+        cursor: "none",
       }}
     />
   );
