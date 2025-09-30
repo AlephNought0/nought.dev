@@ -11,7 +11,7 @@ interface NumberParticle {
 }
 
 const sequences = [
-  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+  [0, 2, 1, 4, 3, 6, 5, 8, 7, 9],
   [1, 3, 5, 7, 9, 1, 3, 5, 7, 9],
   [0, 2, 4, 6, 8, 0, 2, 4, 6, 8],
   [3, 5, 1, 8, 9, 2, 4, 7, 6, 0],
@@ -78,13 +78,13 @@ export default function NumberParticlesBackground() {
   const updateAllNumbers = useCallback(() => {
     const particles = particlesRef.current;
     particles.forEach((particle) => {
-      // Get this particle's sequence
+      // Get this particle's sequence.
       const sequence = sequences[particle.sequenceIndex];
 
-      // Move to next position in sequence (loop back to start if at end)
+      // Move to next position in sequence (loop back to start if at end).
       particle.valueIndex = (particle.valueIndex + 1) % sequence.length;
 
-      // Update the actual displayed value
+      // Update the actual displayed value.
       particle.value = sequence[particle.valueIndex];
     });
   }, []);
@@ -99,7 +99,7 @@ export default function NumberParticlesBackground() {
       const particles = particlesRef.current;
       const mouseInteractionRadius = 200;
 
-      // Check whether or not 35ms has passed.
+      // Check whether or not 67ms has passed.
       if (timestamp - lastUpdateRef.current > updateIntervalRef.current) {
         updateAllNumbers();
         lastUpdateRef.current = timestamp;
@@ -108,6 +108,15 @@ export default function NumberParticlesBackground() {
       // Fill the canvas with black color to avoid fading effect.
       ctx.fillStyle = "black";
       ctx.fillRect(0, 0, width, height);
+
+      // Create size groups for batched rendering.
+      const groups = {
+        extraLarge: [] as { particle: NumberParticle }[],
+        large: [] as { particle: NumberParticle }[],
+        medium: [] as { particle: NumberParticle }[],
+        small: [] as { particle: NumberParticle }[],
+        extraSmall: [] as { particle: NumberParticle }[],
+      };
 
       particles.forEach((particle) => {
         const distance = getDistanceFromMouse(particle);
@@ -121,15 +130,41 @@ export default function NumberParticlesBackground() {
           size *= 1 - proximityFactor * 0.7;
         }
 
-        ctx.fillStyle = `rgba(255, 255, 255, ${0.8 - particle.z * 0.5})`;
-        ctx.font = `${size}px monospace`;
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText(particle.value.toString(), particle.x, particle.y);
+        // Group particles based on size.
+        if (size > 22) groups.extraLarge.push({ particle });
+        else if (size > 18) groups.large.push({ particle });
+        else if (size > 14) groups.medium.push({ particle });
+        else if (size > 10) groups.small.push({ particle });
+        else groups.extraSmall.push({ particle });
       });
+
+      // Batch write the particles based on groups.
+      drawGroup(ctx, groups.extraLarge, "32px monospace");
+      drawGroup(ctx, groups.large, "24px monospace");
+      drawGroup(ctx, groups.medium, "18px monospace");
+      drawGroup(ctx, groups.small, "14px monospace");
+      drawGroup(ctx, groups.extraSmall, "10px monospace");
     },
-    [],
+    [updateAllNumbers],
   );
+
+  const drawGroup = (
+    ctx: CanvasRenderingContext2D,
+    particles: { particle: NumberParticle }[],
+    font: string,
+  ) => {
+    if (particles.length === 0) return;
+
+    ctx.font = font;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+    particles.forEach(({ particle }) => {
+      const opacity = 0.8 - particle.z * 0.5;
+      ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
+      ctx.fillText(particle.value.toString(), particle.x, particle.y);
+    });
+  };
 
   // This entire thing handles the canvas animation. It also changes the size to fit the screen all the time.
   useEffect(() => {
