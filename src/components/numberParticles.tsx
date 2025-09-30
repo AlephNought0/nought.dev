@@ -22,7 +22,7 @@ export default function NumberParticlesBackground() {
   const mouseRef = useRef({ x: 0, y: 0 });
   const particlesRef = useRef<NumberParticle[]>([]);
   const lastUpdateRef = useRef<number>(0);
-  const updateIntervalRef = useRef<number>(35);
+  const updateIntervalRef = useRef<number>(67);
 
   const initParticles = useCallback((width: number, height: number) => {
     const particles: NumberParticle[] = [];
