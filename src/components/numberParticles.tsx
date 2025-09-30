@@ -131,10 +131,10 @@ export default function NumberParticlesBackground() {
         }
 
         // Group particles based on size.
-        if (size > 22) groups.extraLarge.push({ particle });
-        else if (size > 18) groups.large.push({ particle });
+        if (size > 20) groups.extraLarge.push({ particle });
+        else if (size > 16) groups.large.push({ particle });
         else if (size > 14) groups.medium.push({ particle });
-        else if (size > 10) groups.small.push({ particle });
+        else if (size > 12) groups.small.push({ particle });
         else groups.extraSmall.push({ particle });
       });
 
