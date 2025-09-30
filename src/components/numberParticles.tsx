@@ -149,7 +149,7 @@ export default function NumberParticlesBackground() {
       particles.forEach((particle) => {
         const distance = getDistanceFromMouse(particle);
 
-        let size = particle.size * (0.4 + (1 - particle.z) * 0.6);
+        let size = particle.size;
 
         // If the distance between the mouse and the particle is smaller than the interaction mouseInteractionRadius
         // then make the number smaller.
@@ -159,10 +159,10 @@ export default function NumberParticlesBackground() {
         }
 
         // Group particles based on size.
-        if (size > 20) groups.extraLarge.push({ particle });
-        else if (size > 16) groups.large.push({ particle });
-        else if (size > 14) groups.medium.push({ particle });
-        else if (size > 13) groups.small.push({ particle });
+        if (size > 22) groups.extraLarge.push({ particle });
+        else if (size > 20) groups.large.push({ particle });
+        else if (size > 18) groups.medium.push({ particle });
+        else if (size > 16) groups.small.push({ particle });
         else groups.extraSmall.push({ particle });
       });
 
