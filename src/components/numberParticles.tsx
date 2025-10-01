@@ -6,16 +6,7 @@ interface NumberParticle {
   z: number;
   value: number;
   size: number;
-  sequenceIndex: number;
-  valueIndex: number;
 }
-
-const sequences = [
-  [0, 2, 1, 4, 3, 6, 5, 8, 7, 9],
-  [1, 3, 5, 7, 9, 1, 3, 5, 7, 9],
-  [0, 2, 4, 6, 8, 0, 2, 4, 6, 8],
-  [3, 5, 1, 8, 9, 2, 4, 7, 6, 0],
-];
 
 export default function NumberParticlesBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -43,23 +34,13 @@ export default function NumberParticlesBackground() {
         const x = baseX + (Math.random() - 0.5) * randomOffset;
         const y = baseY + (Math.random() - 0.5) * randomOffset;
 
-        // Get initial index values for the particles.
-        const sequenceIndex = Math.floor(Math.random() * sequences.length);
-        const valueIndex = Math.floor(
-          Math.random() * sequences[sequenceIndex].length,
-        );
-
-        const initialValue = sequences[sequenceIndex][valueIndex];
-
         // Create the "particle".
         particles.push({
           x: x,
           y: y,
           z: Math.random(),
-          value: initialValue,
+          value: Math.floor(Math.random() * 10),
           size: 15 + Math.random() * 10,
-          sequenceIndex: sequenceIndex,
-          valueIndex: valueIndex,
         });
       }
     }
@@ -78,14 +59,13 @@ export default function NumberParticlesBackground() {
   const updateAllNumbers = useCallback(() => {
     const particles = particlesRef.current;
     particles.forEach((particle) => {
-      // Get this particle's sequence.
-      const sequence = sequences[particle.sequenceIndex];
+      let newValue;
+      // Don't apply the same number as the last one.
+      do {
+        newValue = Math.floor(Math.random() * 10);
+      } while (newValue === particle.value);
 
-      // Move to next position in sequence (loop back to start if at end).
-      particle.valueIndex = (particle.valueIndex + 1) % sequence.length;
-
-      // Update the actual displayed value.
-      particle.value = sequence[particle.valueIndex];
+      particle.value = newValue;
     });
   }, []);
 
